@@ -1,0 +1,3 @@
+# CharactersTable
+
+Place component documentation here...
