@@ -1,11 +1,11 @@
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
 }
   
-table, th, td {
-  border: 1px solid #ddd;
+th {
+  border-bottom: 1px solid #ddd;
 }
 
 th, td {
@@ -13,14 +13,47 @@ th, td {
   text-align: left;
 }
 
-th {
-  background-color: #a0933b;
+.title svg {
+  border-radius: 4px;
+}
+
+.table-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
 }
   
 .toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+
+.toolbar input {
+  height: 1rem;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.table-content {
+  height: calc(100vh - 400px);
+  position: relative;
+  overflow: auto;
+  background: #4e474736;
+  border-radius: 8px;
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+
+.table-header {
+  position: sticky;
+  top: 0;
+  background-color: #2d2c2c;
+  z-index: 2;
 }
 
 .pagination {

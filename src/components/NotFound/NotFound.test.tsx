@@ -6,6 +6,6 @@ describe("NotFound component", () => {
     render(<NotFound data-testid="testId" />);
   });
   it("NotFound is rendered correctly", () => {
-    expect(screen.getByTestId("testId")).toBeInTheDocument();
+    expect(screen.getByTestId("testId_NotFound")).toBeInTheDocument();
   });
 });

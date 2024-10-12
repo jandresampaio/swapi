@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { CharactersTableProps } from "./CharactersTable.types";
 import { GetCharactersResponse, swApiService } from "../../services/swapi";
 import { CharactersTableColumns } from "./CharactersTable.helper";
 import "./CharactersTable.css";
+import LoadingIndicator from "../../components/LoadingIndicator";
+import Logo from "../../components/Logo";
+import NotFound from "../../components/NotFound";
+import ErrorIndicator from "../../components/ErrorIndicator";
 
-export const CharactersTable: React.FC<CharactersTableProps> = ({
-  "data-testid": testId,
-}) => {
+export const CharactersTable: React.FC = () => {
   const [characters, setCharacters] = useState<GetCharactersResponse>({
     count: 0,
     next: null,
@@ -17,6 +18,7 @@ export const CharactersTable: React.FC<CharactersTableProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState<string>("");
   const searchTimeOut = useRef(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const initialPageData = {
     pageNumber: 1,
     pageUrl: "",
@@ -25,17 +27,23 @@ export const CharactersTable: React.FC<CharactersTableProps> = ({
     pageNumber: number;
     pageUrl: string;
   }>(initialPageData);
+  const pageSize = 10;
+  const startItem = (currentPage.pageNumber - 1) * pageSize + 1;
+  const endItem = startItem + characters.results.length - 1;
 
   const fetchCharacters = useCallback(
     async ({ search, pageUrl }: { search?: string; pageUrl?: string }) => {
       try {
         setLoading(true);
         const response = await swApiService.getCharacters({ search, pageUrl });
-        console.log("response", response);
         setCharacters(response.data);
+        setTimeout(() => {
+          searchInputRef.current?.focus();
+        }, 200);
+        setError(null);
       } catch (err) {
         console.error("Error fetching characters: ", err);
-        setError("Failed to fetch characters");
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -79,16 +87,18 @@ export const CharactersTable: React.FC<CharactersTableProps> = ({
       }));
   };
 
-  const isTableLoaded = !loading && !error;
-
-  console.log("loading: ", loading);
   return (
-    <div data-testid={testId}>
-      <h1 className="title">Star Wars Characters</h1>
-
+    <div data-testid="CharactersTable" className="table-container">
+      <div data-testid="CharactersTable Logo" className="title">
+        <Logo />
+      </div>
       <div className="toolbar">
-        <p>{characters.count} Characters</p>
+        <h3 data-testid="CharactersTable Title">
+          {characters.count} Characters
+        </h3>
         <input
+          data-testid="CharactersTable_input Search"
+          ref={searchInputRef}
           type="text"
           placeholder="Search..."
           disabled={loading}
@@ -96,37 +106,80 @@ export const CharactersTable: React.FC<CharactersTableProps> = ({
           onChange={handleSearch}
         />
       </div>
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
-      {isTableLoaded && (
-        <table>
-          <thead>
-            <tr>
-              {CharactersTableColumns.map((column, index) => (
-                <th key={index}>{column.title}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {characters.results.map((character, index) => (
-              <tr key={index}>
+      <div className="table-content">
+        {loading && (
+          <LoadingIndicator data-testid="CharactersTable_LoadingIndicator" />
+        )}
+
+        {
+          <table
+            className="table-datagrid"
+            style={{
+              opacity: loading ? 0.5 : 1,
+            }}
+          >
+            <thead className="table-header">
+              <tr>
                 {CharactersTableColumns.map((column, index) => (
-                  <td key={index}>{character[column.fieldName]}</td>
+                  <th
+                    key={index}
+                    style={{
+                      width: 100 / CharactersTableColumns.length + "%",
+                    }}
+                  >
+                    {column.title}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-      <div className="pagination">
+            </thead>
+            <tbody>
+              {characters.results.length === 0 && !loading && <NotFound />}
+              {error && !loading && (
+                <ErrorIndicator
+                  data-testid="CharactersTable_ErrorIndicator"
+                  errorMessage={error}
+                  retry={() =>
+                    fetchCharacters({
+                      search: searchText,
+                      pageUrl: currentPage.pageUrl,
+                    })
+                  }
+                />
+              )}
+              {!error &&
+                characters.results.map((character, index) => (
+                  <tr
+                    data-testid={`CharactersTable_Row_${character.name}`}
+                    key={index}
+                  >
+                    {CharactersTableColumns.map((column, index) => (
+                      <td key={index}>{character[column.fieldName]}</td>
+                    ))}
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        }
+      </div>
+
+      <div
+        data-testid="CharactersTable PaginationSection"
+        className="pagination"
+      >
         <button
+          data-testid="CharactersTable_button Previous"
           onClick={handlePrevPage}
-          disabled={!characters.previous || loading}
+          disabled={!characters.previous || loading || !!error}
         >
           Previous
         </button>
         <span> Page {currentPage.pageNumber} </span>
-        <button onClick={handleNextPage} disabled={!characters.next || loading}>
+        <span>{`(${startItem}-${endItem})`}</span>
+        <button
+          data-testid="CharactersTable_button Next"
+          onClick={handleNextPage}
+          disabled={!characters.next || loading || !!error}
+        >
           Next
         </button>
       </div>
