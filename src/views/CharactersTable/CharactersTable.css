@@ -1,11 +1,11 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
 }
 
-th {
-  border-bottom: 1px solid #ddd;
+thead {
+  box-shadow: 0 1px 0px 0px lightgrey;
+  height: 50px;
 }
 
 th,
