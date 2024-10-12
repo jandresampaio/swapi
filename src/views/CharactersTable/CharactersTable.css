@@ -3,12 +3,13 @@ table {
   border-collapse: collapse;
   margin: 20px 0;
 }
-  
+
 th {
   border-bottom: 1px solid #ddd;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   text-align: left;
 }
@@ -21,13 +22,20 @@ th, td {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   width: 100%;
 }
-  
+
 .toolbar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.toolbar .title {
+  display: flex;
+  gap: 1rem;
   align-items: center;
 }
 
@@ -40,7 +48,7 @@ th, td {
 }
 
 .table-content {
-  height: calc(100vh - 400px);
+  height: calc(100vh - 200px);
   position: relative;
   overflow: auto;
   background: #4e474736;

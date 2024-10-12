@@ -89,11 +89,9 @@ export const CharactersTable: React.FC = () => {
 
   return (
     <div data-testid="CharactersTable" className="table-container">
-      <div data-testid="CharactersTable Logo" className="title">
-        <Logo />
-      </div>
       <div className="toolbar">
-        <h3 data-testid="CharactersTable Title">
+        <h3 data-testid="CharactersTable Title" className="title">
+          <Logo />
           {characters.count} Characters
         </h3>
         <input
