@@ -35,11 +35,13 @@ export const CharactersTable: React.FC = () => {
     async ({ search, pageUrl }: { search?: string; pageUrl?: string }) => {
       try {
         setLoading(true);
+        const focusedElement = document.activeElement;
         const response = await swApiService.getCharacters({ search, pageUrl });
         setCharacters(response.data);
-        setTimeout(() => {
-          searchInputRef.current?.focus();
-        }, 200);
+        if (focusedElement)
+          setTimeout(() => {
+            (focusedElement as HTMLElement)?.focus?.();
+          }, 200);
         setError(null);
       } catch (err) {
         console.error("Error fetching characters: ", err);
@@ -108,58 +110,54 @@ export const CharactersTable: React.FC = () => {
         {loading && (
           <LoadingIndicator data-testid="CharactersTable_LoadingIndicator" />
         )}
-
-        {
-          <table
-            className="table-datagrid"
-            style={{
-              opacity: loading ? 0.5 : 1,
-            }}
-          >
-            <thead className="table-header">
-              <tr>
-                {CharactersTableColumns.map((column, index) => (
-                  <th
-                    key={index}
-                    style={{
-                      width: 100 / CharactersTableColumns.length + "%",
-                    }}
-                  >
-                    {column.title}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {characters.results.length === 0 && !loading && <NotFound />}
-              {error && !loading && (
-                <ErrorIndicator
-                  data-testid="CharactersTable_ErrorIndicator"
-                  errorMessage={error}
-                  retry={() =>
-                    fetchCharacters({
-                      search: searchText,
-                      pageUrl: currentPage.pageUrl,
-                    })
-                  }
-                />
-              )}
-              {!error &&
-                characters.results.map((character, index) => (
-                  <tr
-                    data-testid={`CharactersTable_Row_${character.name}`}
-                    key={index}
-                  >
-                    {CharactersTableColumns.map((column, index) => (
-                      <td key={index}>{character[column.fieldName]}</td>
-                    ))}
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        }
+        <table
+          className="table-datagrid"
+          style={{
+            opacity: loading ? 0.5 : 1,
+          }}
+        >
+          <thead className="table-header">
+            <tr>
+              {CharactersTableColumns.map((column, index) => (
+                <th
+                  key={index}
+                  style={{
+                    width: 100 / CharactersTableColumns.length + "%",
+                  }}
+                >
+                  {column.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {characters.results.length === 0 && !loading && <NotFound message="No Results Found" />}
+            {error && !loading && (
+              <ErrorIndicator
+                data-testid="CharactersTable_ErrorIndicator"
+                errorMessage={error}
+                retry={() =>
+                  fetchCharacters({
+                    search: searchText,
+                    pageUrl: currentPage.pageUrl,
+                  })
+                }
+              />
+            )}
+            {!error &&
+              characters.results.map((character, index) => (
+                <tr
+                  data-testid={`CharactersTable_Row_${character.name}`}
+                  key={index}
+                >
+                  {CharactersTableColumns.map((column, index) => (
+                    <td key={index}>{character[column.fieldName]}</td>
+                  ))}
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </div>
-
       <div
         data-testid="CharactersTable PaginationSection"
         className="pagination"

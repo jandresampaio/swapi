@@ -14,13 +14,11 @@ const App = () => {
 
   return (
     <Routes>
-    <Route
-      path={`${ROUTES.home.href}`} element={<CharactersTable />}
-   />
-
-
-    <Route path="*" element={<NotFound />} />
-  </Routes>
+      <Route
+        path={`${ROUTES.home.href}`} element={<CharactersTable />}
+      />
+      <Route path="*" element={<NotFound message="Route not found" />} />
+    </Routes>
   )
 }
 
